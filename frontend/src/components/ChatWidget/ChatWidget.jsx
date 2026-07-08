@@ -27,7 +27,9 @@ function ChatWidget() {
     setLoading(true);
 
     try {
-      const res = await fetch("http://localhost:8000/chat", {
+      const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+
+      const res = await fetch(`${API_URL}/chat`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -36,6 +38,10 @@ function ChatWidget() {
           message: userMessage.content,
         }),
       });
+
+      if (!res.ok) {
+        throw new Error(`HTTP ${res.status}`);
+      }
 
       const data = await res.json();
 
