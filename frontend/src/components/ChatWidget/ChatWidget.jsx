@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import "./ChatWidget.css";
 import ReactMarkdown from "react-markdown";
 
@@ -14,6 +14,16 @@ function ChatWidget() {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const messagesEndRef = useRef(null);
+
+  const scrollToBottom = () => {
+    setTimeout(() => {
+      messagesEndRef.current?.scrollIntoView({
+        behavior: "smooth",
+      });
+    }, 100);
+  };
+
   const sendMessage = async () => {
     if (!input.trim()) return;
 
@@ -25,6 +35,7 @@ function ChatWidget() {
     setMessages((prev) => [...prev, userMessage]);
     setInput("");
     setLoading(true);
+    scrollToBottom();
 
     try {
       const API_URL =
@@ -54,6 +65,8 @@ function ChatWidget() {
           content: data.response || "Sorry, I couldn't get a response.",
         },
       ]);
+
+      scrollToBottom();
     } catch (error) {
       console.error(error);
 
@@ -65,6 +78,8 @@ function ChatWidget() {
             "Sorry, the AI assistant is currently unavailable. Please try again later.",
         },
       ]);
+
+      scrollToBottom();
     } finally {
       setLoading(false);
     }
@@ -92,6 +107,8 @@ function ChatWidget() {
             {loading && (
               <div className="chat-message assistant">Thinking...</div>
             )}
+
+            <div ref={messagesEndRef} />
           </div>
 
           <div className="chat-input-area">
